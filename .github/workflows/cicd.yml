@@ -11,6 +11,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      nowUsername: ${{ secrets.sn_userName }}
+      nowPassword: ${{ secrets.sn_password }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -23,7 +26,7 @@ jobs:
       # it to that bare form, and stops the run with a clear message if it cannot.
       - name: Resolve ServiceNow instance
         env:
-          RAW: ${{ vars.SN_INSTANCE_DOMAIN }}
+          RAW: ${{ vars.sn_instanceURL }}
         run: |
           if [ -z "$RAW" ]; then
             echo "::error::SN_INSTANCE_DOMAIN is not set. Add it under Settings, then Secrets and variables, then Actions, on the Variables tab."
@@ -56,4 +59,9 @@ jobs:
           echo "Resolved ServiceNow instance: $INSTANCE"
           echo "SN_INSTANCE=$INSTANCE" >> "$GITHUB_ENV"
 
-      # TODO: Add the pipeline credentials (job-level env block) and the apply changes step here
+      - name: Apply changes
+        uses: ServiceNow/sncicd-apply-changes@2.0.0
+        continue-on-error: true
+        env:
+          nowSourceInstance: ${{ env.SN_INSTANCE }}
+          appScope: x_cd_grc_app
