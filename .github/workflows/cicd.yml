@@ -65,5 +65,3 @@ jobs:
         env:
           nowSourceInstance: ${{ env.SN_INSTANCE }}
           appScope: x_cd_grc_app
-
-          # hhh
